@@ -1,0 +1,343 @@
+:root{
+  --bg-dark: #003049;
+  --danger: #d62828;
+  --accent: #f77f00;
+  --accent-light: #fcbf49;
+  --paper: #eae2b7;
+  --text-dark: #1f1f1f;
+  --muted: #6b6b6b;
+  --white: #ffffff;
+  --radius: 8px;
+  --container-w: 1100px;
+}
+
+/* Reset ligero */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--paper);
+  color: var(--text-dark);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Layout general */
+header {
+  background: var(--bg-dark);
+  color: var(--white);
+  padding: 14px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+header nav {
+  max-width: var(--container-w);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+nav .brand { font-weight: 700; color: var(--accent); }
+nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 18px; align-items: center; }
+nav a { color: var(--white); text-decoration: none; font-weight: 600; }
+
+/* Container */
+.container { max-width: var(--container-w); margin: 0 auto; padding: 28px; }
+
+/* Sections */
+.section {
+  margin: 18px 0;
+  padding: 28px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.45));
+  box-shadow: 0 6px 18px rgba(16,24,40,0.03);
+}
+.section + .section { margin-top: 18px; }
+.section .wrap { display: block; }
+
+/* Titles */
+.title { margin: 0 0 8px; font-size: clamp(20px,3vw,36px); color: var(--bg-dark); }
+.section-title { margin: 0 0 12px; font-size: 20px; color: var(--bg-dark); }
+.lead { color: var(--muted); margin-top: 6px; }
+
+/* Buttons */
+.btn-primary {
+  background: var(--accent);
+  color: var(--white);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-primary:hover { background: var(--accent-light); color: #000; }
+.btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-dark);
+}
+
+/* Utilities */
+.hidden { display: none !important; }
+
+/* Creator layout: preview left (centered square) and controls right */
+.two-col-creator{
+  display: grid;
+  grid-template-columns: minmax(360px, 52%) minmax(300px, 48%);
+  gap: 22px;
+  align-items: start;
+  align-content: start;
+  max-width: var(--container-w);
+  margin: 0 auto;
+}
+
+/* Responsive: stack columns */
+@media (max-width: 880px){
+  .two-col-creator { grid-template-columns: 1fr; }
+}
+
+/* Preview square centered inside its column */
+.preview-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center; /* center horizontally */
+  justify-content: flex-start;
+  min-width: 0;
+}
+
+/* Caja de preview siempre cuadrada y centrada */
+.preview-canvas-square{
+  width: 100%;
+  max-width: 560px;
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  background: linear-gradient(180deg,#fff,#faf8f5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed rgba(0,0,0,0.06);
+  overflow: hidden;
+  position: relative;
+}
+
+/* El contenido del preview (canvas/img/svg) ocupa el espacio manteniendo proporción */
+.preview-canvas-square img,
+.preview-canvas-square canvas,
+.preview-canvas-square svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Hint debajo del preview centrado y de ancho controlado */
+.preview-col .hint {
+  max-width: 560px;
+  text-align: center;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+/* Controls column */
+.controls-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 6px;
+}
+
+/* Controls flow: grid with 2 columns on wide screens, 1 on small */
+.controls-flow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px 12px;
+  align-items: center;
+}
+@media (min-width: 720px) {
+  .controls-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Each control cell: label, selector, swatch */
+.ctrl-cell {
+  display: grid;
+  grid-template-columns: 92px 1fr 42px;
+  gap: 10px;
+  align-items: center;
+}
+@media (max-width:720px){
+  .ctrl-cell {
+    grid-template-columns: 1fr 56px;
+  }
+  .ctrl-cell .ctrl-label { grid-column: 1 / -1; margin-bottom: 6px; text-align: left; }
+  .ctrl-cell .ctrl-select { grid-column: 1 / 2; }
+  .ctrl-cell .ctrl-color { grid-column: 2 / 3; align-self: start; }
+}
+
+/* Label */
+.ctrl-label {
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: right;
+  padding-right: 8px;
+}
+
+/* Selector compact */
+.ctrl-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-dark);
+  font-weight: 600;
+  font-size: 14px;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ctrl-select .caret { opacity: 0.6; margin-left: 8px; font-size: 12px; }
+
+/* Color swatch */
+.ctrl-color {
+  width: 38px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 0;
+  background: #fff;
+  cursor: pointer;
+}
+
+/* Optional: hide swatch for fields that don't need it */
+.ctrl-cell.no-swatch { grid-template-columns: 92px 1fr; }
+.ctrl-cell.no-swatch .ctrl-color { display: none; }
+
+/* Thumbs dropdown (JS will position/show) */
+.ctrl-thumbs {
+  position: absolute;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  border-radius: 8px;
+  padding: 8px;
+  width: 260px;
+  max-height: 320px;
+  overflow: auto;
+  z-index: 60;
+}
+.ctrl-thumb-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.ctrl-thumb-row:hover {
+  background: linear-gradient(90deg, rgba(247,127,0,0.06), rgba(252,191,73,0.04));
+}
+.ctrl-thumb-row img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+.ctrl-thumb-row .thumb-label {
+  font-size: 13px;
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+/* Actions (buttons) centered under controls column */
+.actions-inline {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center; /* center buttons horizontally */
+  margin-top: 12px;
+}
+
+/* Slightly smaller buttons for compact UI */
+.btn-primary, .btn-ghost {
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+/* Ensure preview column content doesn't push controls */
+.preview-col, .controls-col { min-width: 0; }
+
+/* Final responsive tweaks */
+@media (max-width:480px){
+  header nav { padding: 0 12px; }
+  .container { padding: 18px; }
+  .preview-canvas-square { max-width: 100%; }
+}
+
+
+
+
+
+/* Forzar layout de equipo: 2 columnas en escritorio, 1 en móvil */
+.section-team .team-wrap {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 20px !important;
+  align-items: start !important;
+  max-width: var(--container-w);
+  margin: 0 auto;
+}
+
+/* Tarjeta: imagen arriba, texto debajo, centradas */
+.section-team .team-member-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 16px !important;
+  border-radius: 10px !important;
+  background: transparent !important;
+  box-shadow: 0 6px 14px rgba(16,24,40,0.03) !important;
+  border: 1px solid rgba(0,0,0,0.02) !important;
+}
+
+/* Avatar controlado: no crece, no desborda */
+.section-team .avatar-card {
+  width: 140px !important;
+  height: 140px !important;
+  object-fit: cover !important;
+  border-radius: 12px !important;
+  border: 2px solid rgba(0,0,0,0.04) !important;
+  background: var(--paper) !important;
+  display: block !important;
+}
+
+/* Texto debajo de la imagen */
+.section-team .team-info {
+  text-align: center !important;
+  width: 100% !important;
+}
+.section-team .team-info h3 { margin: 6px 0 4px !important; color: var(--bg-dark) !important; font-weight: 700 !important; }
+.section-team .team-info p { margin: 0 0 6px !important; color: var(--muted) !important; }
+
+/* Responsive: apilar en pantallas pequeñas */
+@media (max-width: 860px) {
+  .section-team .team-wrap { grid-template-columns: 1fr !important; }
+  .section-team .avatar-card { width: 96px !important; height: 96px !important; border-radius: 12px !important; }
+}

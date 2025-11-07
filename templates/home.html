@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="container">
+
+  <!-- Sección 1: Bienvenida -->
+  <section id="bienvenida" class="section section-welcome">
+    <div class="wrap">
+      <h1 class="title">¡Bienvenido a Xpresarte!</h1>
+      <p class="lead">Crea tu personaje, genera stickers y descarga tu hoja imprimible.</p>
+    </div>
+  </section>
+
+  <!-- Sección 2: Creador de personajes (actualizada) -->
+  <section id="creador" class="section section-creator">
+    <div class="wrap two-col-creator">
+      <!-- Columna izquierda: preview (cuadrado fijo, responsivo) -->
+      <div class="col preview-col">
+        <h2 class="section-title">Previsualización</h2>
+        <div id="preview-canvas" class="preview-canvas-square">
+          <div class="preview-placeholder">Preview del personaje</div>
+        </div>
+        <p class="hint">Usa los controles a la derecha para personalizar. Cuando termines, ve a Exportar.</p>
+      </div>
+
+      <!-- Columna derecha: selectores compactos que fluyen en dos columnas si hace falta -->
+      <aside class="col controls-col">
+        <h2 class="section-title">Personaliza</h2>
+
+        <div class="controls-flow">
+          <!-- Cada control es una celda: label | selector | color -->
+          <div class="ctrl-cell">
+            <label class="ctrl-label" for="select-base">Base</label>
+            <button class="ctrl-select" id="select-base" data-field="base">base-01.png <span class="caret">▾</span></button>
+            <input class="ctrl-color" id="color-base" type="color" value="#ffffff" title="Color base">
+          </div>
+
+          <div class="ctrl-cell">
+            <label class="ctrl-label" for="select-boca">Boca</label>
+            <button class="ctrl-select" id="select-boca" data-field="boca">boca-01.png <span class="caret">▾</span></button>
+            <input class="ctrl-color" id="color-boca" type="color" value="#ffffff" title="Color boca">
+          </div>
+
+          <div class="ctrl-cell">
+            <label class="ctrl-label" for="select-barba">Barba</label>
+            <button class="ctrl-select" id="select-barba" data-field="barba">barba-01.png <span class="caret">▾</span></button>
+            <input class="ctrl-color" id="color-barba" type="color" value="#9A9A9A" title="Color barba">
+          </div>
+
+          <div class="ctrl-cell">
+            <label class="ctrl-label" for="select-cejas">Cejas</label>
+            <button class="ctrl-select" id="select-cejas" data-field="cejas">cejas-01.png <span class="caret">▾</span></button>
+            <input class="ctrl-color" id="color-cejas" type="color" value="#1f1f1f" title="Color cejas">
+          </div>
+
+          <div class="ctrl-cell">
+            <label class="ctrl-label" for="select-nariz">Nariz</label>
+            <button class="ctrl-select" id="select-nariz" data-field="nariz">nariz-01.png <span class="caret">▾</span></button>
+            <input class="ctrl-color" id="color-nariz" type="color" value="#ffffff" title="Color nariz">
+          </div>
+
+          <div class="ctrl-cell">
+            <label class="ctrl-label" for="select-ojos">Ojos</label>
+            <button class="ctrl-select" id="select-ojos" data-field="ojos">ojos-01.png <span class="caret">▾</span></button>
+            <input class="ctrl-color" id="color-iris" type="color" value="#2b2b2b" title="Color iris">
+          </div>
+
+          <div class="ctrl-cell">
+            <label class="ctrl-label" for="select-orejas">Orejas</label>
+            <button class="ctrl-select" id="select-orejas" data-field="orejas">orejas-01.png <span class="caret">▾</span></button>
+            <input class="ctrl-color" id="color-orejas" type="color" value="#ffffff" title="Color orejas">
+          </div>
+
+          <div class="ctrl-cell">
+            <label class="ctrl-label" for="select-peinado">Peinado</label>
+            <button class="ctrl-select" id="select-peinado" data-field="peinado">peinado-01.png <span class="caret">▾</span></button>
+            <input class="ctrl-color" id="color-peinado" type="color" value="#f77f00" title="Color peinado">
+          </div>
+
+          <div class="ctrl-cell">
+            <label class="ctrl-label" for="select-ropa">Ropa</label>
+            <button class="ctrl-select" id="select-ropa" data-field="ropa">ropa-01.png <span class="caret">▾</span></button>
+            <input class="ctrl-color" id="color-ropa" type="color" value="#fcbf49" title="Color ropa">
+          </div>
+        </div>
+
+        <div class="actions-inline" style="margin-top:12px;">
+          <button id="btn-preview" class="btn-primary">Actualizar</button>
+          <button id="btn-reset" class="btn-ghost">Reset</button>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+
+  <!-- Sección 3: Acciones (inicialmente oculta) -->
+  <section id="acciones" class="section section-actions" style="display:none;">
+    <div class="wrap">
+      <h2 class="section-title">Exportar</h2>
+      <p class="hint">Genera las 5 imágenes (neutral + 4 emociones) y la hoja A4 imprimible.</p>
+      <div class="actions-row">
+        <button id="btn-generate" class="btn-primary">Generar pack</button>
+        <button id="btn-download-image" class="btn-secondary" disabled>Descargar imagen</button>
+        <button id="btn-print-sheet" class="btn-secondary" disabled>Imprimir hoja</button>
+      </div>
+      <div id="export-status" class="export-status" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- Sección 4: Info del proyecto -->
+  <section id="proyecto" class="section section-project">
+    <div class="wrap">
+      <h2 class="section-title">Sobre Xpresarte</h2>
+      <p>
+        Xpresarte es un prototipo para crear stickers personalizados a partir de un modelo modular.
+        Este prototipo permite combinar capas, recolorear elementos y exportar imágenes y una hoja A4 para impresión.
+      </p>
+      <ul class="project-list">
+        <li><strong>Formato de trabajo:</strong> PNG modulados y recoloreables.</li>
+        <li><strong>Exportes:</strong> PNG 512×512 para stickers y PDF A4 para impresión.</li>
+        <li><strong>Tecnología:</strong> Django + Pillow (backend) y JavaScript (preview cliente).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Sección 5: Equipo (izquierda programador, derecha ilustrador) -->
+  <section id="equipo" class="section section-team">
+    <div class="wrap team-wrap">
+      <article class="team-member-card">
+        <img src="{% static 'img/programador.png' %}" alt="Programador" class="avatar-card">
+        <div class="team-info">
+          <h3>Programador</h3>
+          <p class="muted">Brayan Estiven Londoño · Rol · correo@ejemplo.com</p>
+          <p class="small">Responsable de la lógica, backend y reportes.</p>
+        </div>
+      </article>
+
+      <article class="team-member-card">
+        <img src="{% static 'img/ilustrador.png' %}" alt="Ilustrador" class="avatar-card">
+        <div class="team-info">
+          <h3>Ilustrador</h3>
+          <p class="muted">Tino Renteria Romero · Rol · sasuket4draws@gmail.com</p>
+          <p class="small">Encargado del diseño modular y assets.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+
+
+  <!-- Sección final: Agradecimiento -->
+  <section id="agradecimiento" class="section section-thanks">
+    <div class="wrap center">
+      <h2 class="section-title">¡Gracias!</h2>
+      <p>Gracias por probar Xpresarte. Si te gustó, comparte y colabora.</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- Scripts mínimos (incluir tu JS después) -->
+<script src="{% static 'js/app.js' %}"></script>
+{% endblock %}
