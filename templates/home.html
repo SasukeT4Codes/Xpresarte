@@ -104,15 +104,24 @@
   <section id="acciones" class="section section-actions" style="display:none;">
     <div class="wrap">
       <h2 class="section-title">Exportar</h2>
-      <p class="hint">Genera las 5 imágenes (neutral + 4 emociones) y la hoja A4 imprimible.</p>
-      <div class="actions-row">
-        <button id="btn-generate" class="btn-primary">Generar pack</button>
-        <button id="btn-download-image" class="btn-secondary" disabled>Descargar imagen</button>
-        <button id="btn-print-sheet" class="btn-secondary" disabled>Imprimir hoja</button>
+      <p class="hint">Genera la imagen final (con outline) y una hoja A4 4×3 lista para imprimir/guardar como PDF.</p>
+
+      <div class="actions-row" style="display:flex;align-items:center;gap:16px;margin-top:12px;">
+        <div id="acciones-preview" style="width:120px;height:120px;border-radius:8px;border:1px solid #e6e6e6;background:#ffffff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.06);overflow:hidden;">
+          <span class="small muted">Preview</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;flex:1;min-width:220px;">
+          <div style="display:flex;gap:10px;">
+            <button id="btn-download-image" class="btn-primary btn-action" disabled>Descargar imagen (PNG)</button>
+            <button id="btn-print-sheet" class="btn-secondary btn-action" disabled>Imprimir / Guardar A4</button>
+          </div>
+          <div id="export-status" class="export-status" aria-live="polite" style="margin-top:6px;color:#666;font-size:13px;"></div>
+        </div>
       </div>
-      <div id="export-status" class="export-status" aria-live="polite"></div>
     </div>
   </section>
+
 
   <!-- Sección 4: Info del proyecto -->
   <section id="proyecto" class="section section-project">
@@ -169,4 +178,5 @@
 <script src="{% static 'js/app-core.js' %}"></script>
 <script src="{% static 'js/app-renderer.js' %}"></script>
 <script src="{% static 'js/app-ui.js' %}"></script>
+<script src="{% static 'js/app-actions.js' %}"></script>
 {% endblock %}

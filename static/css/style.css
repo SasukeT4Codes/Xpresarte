@@ -341,3 +341,34 @@ nav a { color: var(--white); text-decoration: none; font-weight: 600; }
   .section-team .team-wrap { grid-template-columns: 1fr !important; }
   .section-team .avatar-card { width: 96px !important; height: 96px !important; border-radius: 12px !important; }
 }
+
+
+
+
+/* Estilos para la sección acciones */
+.btn-action {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease;
+}
+.btn-action:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+/* Primary: descarga */
+.btn-primary.btn-action {
+  background: linear-gradient(180deg,#ff8a00,#ff6a00);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(255,106,0,0.18);
+}
+.btn-primary.btn-action:hover:not(:disabled) { transform: translateY(-2px); }
+
+/* Secondary: imprimir */
+.btn-secondary.btn-action {
+  background: #fff;
+  color: #222;
+  border: 1px solid #ddd;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+}
+.btn-secondary.btn-action:hover:not(:disabled) { transform: translateY(-2px); }

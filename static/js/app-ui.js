@@ -1,6 +1,6 @@
 // static/js/app-ui.js
 // UI: binding DOM, dropdowns, inputs y sincronizaciones.
-// Depende de AppCore y AppRenderer.
+// Depende de AppCore y AppRenderer. (AppActions se carga después y se invoca desde aquí.)
 
 document.addEventListener('DOMContentLoaded', async () => {
   const core = window.AppCore;
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           if(colorInputs['orejas']) colorInputs['orejas'].value = val;
           if(colorInputs['boca']) colorInputs['boca'].value = renderer.darkenHex(val, 0.06);
 
-          // actualizar state._colorValue para capas afectadas
+          // actualizar state._color_value para capas afectadas
           ['base','nariz','orejas','boca'].forEach(k=>{
             if(core.state[k]) core.state[k]._colorValue = colorInputs[k] ? colorInputs[k].value : undefined;
           });
@@ -129,7 +129,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   // botones actualizar y reset
   const btnPreview = document.getElementById('btn-preview');
   const btnReset = document.getElementById('btn-reset');
-  if(btnPreview) btnPreview.addEventListener('click', () => renderer.render(ctx));
+
+  // Referencias a la sección acciones y botones dentro de ella
+  const accionesSection = document.getElementById('acciones');
+  const btnDownloadImage = document.getElementById('btn-download-image');
+  const btnPrintSheet = document.getElementById('btn-print-sheet');
+  // asegurar que inicialmente estén deshabilitados / ocultos según tu HTML
+  if (accionesSection) accionesSection.style.display = accionesSection.style.display || 'none';
+  if (btnDownloadImage) btnDownloadImage.disabled = true;
+  if (btnPrintSheet) btnPrintSheet.disabled = true;
+
+  // Listener de Reset (mantiene comportamiento previo)
   if(btnReset) btnReset.addEventListener('click', () => {
     if(!assets) return;
     core.categories.forEach(cat => {
@@ -142,6 +152,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderer.render(ctx);
   });
 
+  // Listener de Actualizar: render + delega a AppActions para mostrar sección y preparar descargas
+  if (btnPreview) {
+    btnPreview.addEventListener('click', async () => {
+      // 1) render normal
+      await renderer.render(ctx);
+
+      // 2) delegar en AppActions si está disponible (mostrará la sección y preparará botones)
+      const actionsModule = window.AppActions;
+      if (actionsModule && actionsModule.handlePreviewClick) {
+        try {
+          await actionsModule.handlePreviewClick({
+            canvas: canvas,
+            accionesSectionId: 'acciones',
+            btnDownloadId: 'btn-download-image',
+            btnPrintId: 'btn-print-sheet',
+            previewHolderId: 'acciones-preview',
+            outlinePx: 3,
+            rows: 4,
+            cols: 3
+          });
+        } catch (err) {
+          console.error('AppActions error', err);
+          // fallback: mostrar la sección sin generar archivos
+          if (accionesSection) accionesSection.style.display = 'block';
+          if (btnDownloadImage) btnDownloadImage.disabled = false;
+          if (btnPrintSheet) btnPrintSheet.disabled = false;
+        }
+      } else {
+        // fallback simple si AppActions no está cargado
+        if (accionesSection) accionesSection.style.display = 'block';
+        if (btnDownloadImage) btnDownloadImage.disabled = false;
+        if (btnPrintSheet) btnPrintSheet.disabled = false;
+      }
+    });
+  }
+
   document.addEventListener('click', (e) => {
     if(!e.target.closest('.ctrl-select') && !e.target.closest('.ctrl-thumbs')) closeAllDropdowns();
   });
@@ -149,7 +195,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // render inicial
   renderer.render(ctx);
 
-  // export helper cliente
+  // export helper cliente (opcional)
   window.downloadPreviewPNG = function(filename='xpresarte.png', size=512){
     const out = document.createElement('canvas');
     out.width = size; out.height = size;
