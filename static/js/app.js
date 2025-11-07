@@ -28,6 +28,30 @@ document.addEventListener('DOMContentLoaded', () => {
   let assets = null;   // full JSON from API
   let guideURL = null;
 
+  // helper: parse hex "#rrggbb" -> {r,g,b}
+  function hexToRgb(hex) {
+    hex = (hex || '').replace('#','');
+    if (hex.length === 3) hex = hex.split('').map(h=>h+h).join('');
+    return {
+      r: parseInt(hex.substring(0,2) || '0',16),
+      g: parseInt(hex.substring(2,4) || '0',16),
+      b: parseInt(hex.substring(4,6) || '0',16)
+    };
+  }
+
+  // helper: rgb -> hex
+  function rgbToHex(r,g,b) {
+    const toHex = v => ('0' + Math.max(0, Math.min(255, Math.round(v))).toString(16)).slice(-2);
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  }
+
+  // helper: darken hex by percent (0.05 = 5%)
+  function darkenHex(hex, percent) {
+    const c = hexToRgb(hex);
+    const factor = 1 - percent;
+    return rgbToHex(c.r * factor, c.g * factor, c.b * factor);
+  }
+
   // fetch assets and build UI
   fetch(API).then(r => r.json()).then(json => {
     assets = json;
@@ -85,9 +109,31 @@ document.addEventListener('DOMContentLoaded', () => {
         box.style.top = `${rect.bottom + window.scrollY + 6}px`;
       });
 
-      // color input change -> immediate render
-      if(colorInp) colorInp.addEventListener('input', () => renderPreview());
+      // color input change -> immediate render (but special handling for base below)
+      if(colorInp && cat !== 'base') {
+        colorInp.addEventListener('input', () => renderPreview());
+      }
     });
+
+    // set up base sync AFTER inputs exist
+    if (colorInputs['base']) {
+      colorInputs['base'].addEventListener('input', (ev) => {
+        const baseColor = ev.target.value;
+        // apply to nariz and orejas if those inputs exist
+        if (colorInputs['nariz']) {
+          colorInputs['nariz'].value = baseColor;
+        }
+        if (colorInputs['orejas']) {
+          colorInputs['orejas'].value = baseColor;
+        }
+        // boca: slightly darker (use 6% here)
+        const mouthDarker = darkenHex(baseColor, 0.06);
+        if (colorInputs['boca']) {
+          colorInputs['boca'].value = mouthDarker;
+        }
+        renderPreview();
+      });
+    }
 
     // global click to close dropdowns
     document.addEventListener('click', (e) => {
