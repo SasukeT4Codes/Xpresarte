@@ -83,6 +83,12 @@
             <button class="ctrl-select" id="select-ropa" data-field="ropa">ropa-01.png <span class="caret">▾</span></button>
             <input class="ctrl-color" id="color-ropa" type="color" value="#cfcfcf" title="Color ropa">
           </div>
+
+          <div class="ctrl-cell">
+            <label class="ctrl-label" for="select-accesorio">Accesorio</label>
+            <button class="ctrl-select" id="select-accesorio" data-field="accesorio">accesorio-01.png <span class="caret">▾</span></button>
+            <input class="ctrl-color" id="color-accesorio" type="color" value="#ffffff" title="Color accesorio">
+          </div>
         </div>
 
         <div class="actions-inline" style="margin-top:12px;">
@@ -160,5 +166,7 @@
 </main>
 
 <!-- Scripts mínimos (incluir tu JS después) -->
-<script src="{% static 'js/app.js' %}"></script>
+<script src="{% static 'js/app-core.js' %}"></script>
+<script src="{% static 'js/app-renderer.js' %}"></script>
+<script src="{% static 'js/app-ui.js' %}"></script>
 {% endblock %}
