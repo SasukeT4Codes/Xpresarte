@@ -23,27 +23,60 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Layout general */
+/* Header / Nav */
 header {
   background: var(--bg-dark);
   color: var(--white);
   padding: 14px 20px;
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: 90;
   box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
 header nav {
+  position: relative;
   max-width: var(--container-w);
   margin: 0 auto;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center; /* centra la lista de nav */
   gap: 16px;
+  padding: 0 12px;
 }
-nav .brand { font-weight: 700; color: var(--accent); }
-nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 18px; align-items: center; }
-nav a { color: var(--white); text-decoration: none; font-weight: 600; }
+
+/* Marca a la izquierda, link a home */
+nav .brand {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 800;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+/* Nav list centrada */
+nav .nav-list,
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+nav a {
+  color: var(--white);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+nav a:hover {
+  background: rgba(255,255,255,0.04);
+}
 
 /* Container */
 .container { max-width: var(--container-w); margin: 0 auto; padding: 28px; }
@@ -64,7 +97,7 @@ nav a { color: var(--white); text-decoration: none; font-weight: 600; }
 .section-title { margin: 0 0 12px; font-size: 20px; color: var(--bg-dark); }
 .lead { color: var(--muted); margin-top: 6px; }
 
-/* Buttons */
+/* Buttons general */
 .btn-primary {
   background: var(--accent);
   color: var(--white);
@@ -103,17 +136,17 @@ nav a { color: var(--white); text-decoration: none; font-weight: 600; }
   .two-col-creator { grid-template-columns: 1fr; }
 }
 
-/* Preview square centered inside its column */
+/* Preview column */
 .preview-col {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  align-items: center; /* center horizontally */
+  align-items: center;
   justify-content: flex-start;
   min-width: 0;
 }
 
-/* Caja de preview siempre cuadrada y centrada */
+/* Preview square */
 .preview-canvas-square{
   width: 100%;
   max-width: 560px;
@@ -128,7 +161,7 @@ nav a { color: var(--white); text-decoration: none; font-weight: 600; }
   position: relative;
 }
 
-/* El contenido del preview (canvas/img/svg) ocupa el espacio manteniendo proporción */
+/* Preview content scaling */
 .preview-canvas-square img,
 .preview-canvas-square canvas,
 .preview-canvas-square svg {
@@ -138,7 +171,7 @@ nav a { color: var(--white); text-decoration: none; font-weight: 600; }
   display: block;
 }
 
-/* Hint debajo del preview centrado y de ancho controlado */
+/* Hint under preview */
 .preview-col .hint {
   max-width: 560px;
   text-align: center;
@@ -156,7 +189,7 @@ nav a { color: var(--white); text-decoration: none; font-weight: 600; }
   padding: 6px;
 }
 
-/* Controls flow: grid with 2 columns on wide screens, 1 on small */
+/* Controls grid flow */
 .controls-flow {
   display: grid;
   grid-template-columns: 1fr;
@@ -167,7 +200,7 @@ nav a { color: var(--white); text-decoration: none; font-weight: 600; }
   .controls-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-/* Each control cell: label, selector, swatch */
+/* Control cell */
 .ctrl-cell {
   display: grid;
   grid-template-columns: 92px 1fr 42px;
@@ -223,11 +256,11 @@ nav a { color: var(--white); text-decoration: none; font-weight: 600; }
   cursor: pointer;
 }
 
-/* Optional: hide swatch for fields that don't need it */
+/* Optional: hide swatch */
 .ctrl-cell.no-swatch { grid-template-columns: 92px 1fr; }
 .ctrl-cell.no-swatch .ctrl-color { display: none; }
 
-/* Thumbs dropdown (JS will position/show) */
+/* Thumbs dropdown */
 .ctrl-thumbs {
   position: absolute;
   background: #fff;
@@ -265,12 +298,12 @@ nav a { color: var(--white); text-decoration: none; font-weight: 600; }
   font-weight: 600;
 }
 
-/* Actions (buttons) centered under controls column */
+/* Actions centered under controls */
 .actions-inline {
   display: flex;
   gap: 10px;
   align-items: center;
-  justify-content: center; /* center buttons horizontally */
+  justify-content: center;
   margin-top: 12px;
 }
 
@@ -280,21 +313,17 @@ nav a { color: var(--white); text-decoration: none; font-weight: 600; }
   font-size: 14px;
 }
 
-/* Ensure preview column content doesn't push controls */
+/* Keep columns from pushing each other */
 .preview-col, .controls-col { min-width: 0; }
 
-/* Final responsive tweaks */
+/* Responsive tweaks */
 @media (max-width:480px){
   header nav { padding: 0 12px; }
   .container { padding: 18px; }
   .preview-canvas-square { max-width: 100%; }
 }
 
-
-
-
-
-/* Forzar layout de equipo: 2 columnas en escritorio, 1 en móvil */
+/* Team layout */
 .section-team .team-wrap {
   display: grid !important;
   grid-template-columns: repeat(2, 1fr) !important;
@@ -303,8 +332,6 @@ nav a { color: var(--white); text-decoration: none; font-weight: 600; }
   max-width: var(--container-w);
   margin: 0 auto;
 }
-
-/* Tarjeta: imagen arriba, texto debajo, centradas */
 .section-team .team-member-card {
   display: flex !important;
   flex-direction: column !important;
@@ -316,8 +343,6 @@ nav a { color: var(--white); text-decoration: none; font-weight: 600; }
   box-shadow: 0 6px 14px rgba(16,24,40,0.03) !important;
   border: 1px solid rgba(0,0,0,0.02) !important;
 }
-
-/* Avatar controlado: no crece, no desborda */
 .section-team .avatar-card {
   width: 140px !important;
   height: 140px !important;
@@ -327,25 +352,18 @@ nav a { color: var(--white); text-decoration: none; font-weight: 600; }
   background: var(--paper) !important;
   display: block !important;
 }
-
-/* Texto debajo de la imagen */
 .section-team .team-info {
   text-align: center !important;
   width: 100% !important;
 }
 .section-team .team-info h3 { margin: 6px 0 4px !important; color: var(--bg-dark) !important; font-weight: 700 !important; }
 .section-team .team-info p { margin: 0 0 6px !important; color: var(--muted) !important; }
-
-/* Responsive: apilar en pantallas pequeñas */
 @media (max-width: 860px) {
   .section-team .team-wrap { grid-template-columns: 1fr !important; }
   .section-team .avatar-card { width: 96px !important; height: 96px !important; border-radius: 12px !important; }
 }
 
-
-
-
-/* Estilos para la sección acciones */
+/* Actions specific styles */
 .btn-action {
   padding: 10px 14px;
   border-radius: 8px;
@@ -355,16 +373,12 @@ nav a { color: var(--white); text-decoration: none; font-weight: 600; }
   transition: transform .08s ease, box-shadow .12s ease, opacity .12s ease;
 }
 .btn-action:disabled { opacity: 0.5; cursor: default; transform: none; }
-
-/* Primary: descarga */
 .btn-primary.btn-action {
   background: linear-gradient(180deg,#ff8a00,#ff6a00);
   color: #fff;
   box-shadow: 0 6px 18px rgba(255,106,0,0.18);
 }
 .btn-primary.btn-action:hover:not(:disabled) { transform: translateY(-2px); }
-
-/* Secondary: imprimir */
 .btn-secondary.btn-action {
   background: #fff;
   color: #222;
@@ -372,3 +386,11 @@ nav a { color: var(--white); text-decoration: none; font-weight: 600; }
   box-shadow: 0 3px 10px rgba(0,0,0,0.04);
 }
 .btn-secondary.btn-action:hover:not(:disabled) { transform: translateY(-2px); }
+
+/* Small helpers */
+.center { display:flex; align-items:center; justify-content:center; }
+.text-muted { color: var(--muted); }
+.small { font-size: 12px; }
+
+/* Accessibility: focus states */
+a:focus, button:focus, input:focus { outline: 3px solid rgba(247,127,0,0.18); outline-offset: 2px; border-radius: 6px; }
