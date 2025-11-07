@@ -3,7 +3,13 @@ from pathlib import Path
 from django.conf import settings
 from django.http import JsonResponse
 
+from django.shortcuts import render
+from django.http import HttpResponse
+
 CATEGORIES = ["base","boca","barba","cejas","nariz","ojos","orejas","peinado","ropa"]
+
+def home(request):
+    return render(request, "home.html")
 
 def list_assets(request):
     base_static = Path(settings.BASE_DIR) / "static" / "assets"
