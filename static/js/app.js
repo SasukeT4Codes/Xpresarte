@@ -3,9 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const API = '/api/assets/';
   const renderOrder = ['base','nariz','boca','ojos','barba','ropa','peinado','orejas','cejas'];
   const container = document.getElementById('preview-canvas');
-  const SIZE = 1024; // resolución lógica para composición (ajusta al export si hace falta)
+  const SIZE = 1024; // resolución lógica para composición (ajústala para export si hace falta)
 
-  // referencias a botones/inputs (de tu template)
+  // referencias a botones/inputs (según tu plantilla)
   const categories = ['base','boca','barba','cejas','nariz','ojos','orejas','peinado','ropa'];
   const selectBtns = {};
   const colorInputs = {};
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     colorInputs[c] = document.getElementById(`color-${c}`);
   });
 
-  // preview canvas
+  // canvas de previsualización
   const canvas = document.createElement('canvas');
   canvas.width = SIZE; canvas.height = SIZE;
   canvas.style.width = '100%'; canvas.style.height = '100%';
@@ -22,13 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
   container.appendChild(canvas);
   const ctx = canvas.getContext('2d');
 
-  // app state: for each category store selected id and urls { id, lineart, fondo }
+  // estado de la app: para cada categoría guardamos el item seleccionado { id, lineart, fondo }
   const state = {};
   categories.forEach(c => state[c] = null);
-  let assets = null;   // full JSON from API
-  let guideURL = null;
+  let assets = null;   // JSON completo desde la API
+  let guideURL = null; // URL de la guía compartida (si existe)
 
-  // helper: parse hex "#rrggbb" -> {r,g,b}
+  // helper: convierte hex "#rrggbb" a objeto {r,g,b}
   function hexToRgb(hex) {
     hex = (hex || '').replace('#','');
     if (hex.length === 3) hex = hex.split('').map(h=>h+h).join('');
@@ -39,25 +39,25 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // helper: rgb -> hex
+  // helper: convierte r,g,b a string hex "#rrggbb"
   function rgbToHex(r,g,b) {
     const toHex = v => ('0' + Math.max(0, Math.min(255, Math.round(v))).toString(16)).slice(-2);
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
   }
 
-  // helper: darken hex by percent (0.05 = 5%)
+  // helper: oscurece un color hex un porcentaje (ej. 0.06 = 6%)
   function darkenHex(hex, percent) {
     const c = hexToRgb(hex);
     const factor = 1 - percent;
     return rgbToHex(c.r * factor, c.g * factor, c.b * factor);
   }
 
-  // fetch assets and build UI
+  // Obtener assets desde la API y construir la UI
   fetch(API).then(r => r.json()).then(json => {
     assets = json;
     guideURL = (json.meta && json.meta.guide) ? json.meta.guide : null;
 
-    // Populate each category: set default selection (first item) and attach dropdown
+    // Para cada categoría: seleccionar variante por defecto y crear dropdown de miniaturas
     categories.forEach(cat => {
       const list = (json[cat] || []);
       const btn = selectBtns[cat];
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if(!btn) return;
 
       if(list.length){
-        // pick first variant as default
+        // seleccion por defecto: primera variante
         state[cat] = list[0];
         btn.textContent = `${displayName(list[0])} ▾`;
       } else {
@@ -74,18 +74,17 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.textContent = `— ▾`;
       }
 
-      // click opens thumbnail dropdown
+      // al hacer click en el botón abrimos un dropdown con thumbnails
       btn.addEventListener('click', (ev) => {
         ev.preventDefault();
         closeAllDropdowns();
         const box = document.createElement('div');
         box.className = 'ctrl-thumbs active';
-        // build rows
         (list.length ? list : []).forEach(item => {
           const row = document.createElement('div');
           row.className = 'ctrl-thumb-row';
           const img = document.createElement('img');
-          // prefer lineart for thumb; fallback to fondo if missing
+          // usamos lineart para la miniatura; si no existe usamos fondo
           img.src = item.lineart || item.fondo || '';
           img.alt = item.name || item.id || '';
           const label = document.createElement('div');
@@ -94,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
           row.appendChild(img);
           row.appendChild(label);
           row.addEventListener('click', () => {
+            // al seleccionar actualizamos el state y re-renderizamos
             state[cat] = item;
             btn.textContent = `${displayName(item)} ▾`;
             box.remove();
@@ -103,30 +103,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.body.appendChild(box);
-        // position under button, simple placement (improve if needed)
+        // colocación simple debajo del botón (puedes mejorar esto)
         const rect = btn.getBoundingClientRect();
         box.style.left = `${Math.max(8, rect.left)}px`;
         box.style.top = `${rect.bottom + window.scrollY + 6}px`;
       });
 
-      // color input change -> immediate render (but special handling for base below)
+      // cambios de color en inputs (todos excepto 'base' usan el listener directo)
       if(colorInp && cat !== 'base') {
         colorInp.addEventListener('input', () => renderPreview());
       }
     });
 
-    // set up base sync AFTER inputs exist
+    // sincronización especial: cuando cambia la base se propaga a nariz/orejas y boca recibe versión más oscura
     if (colorInputs['base']) {
       colorInputs['base'].addEventListener('input', (ev) => {
         const baseColor = ev.target.value;
-        // apply to nariz and orejas if those inputs exist
+        // copiar color base a nariz y orejas (si existen)
         if (colorInputs['nariz']) {
           colorInputs['nariz'].value = baseColor;
         }
         if (colorInputs['orejas']) {
           colorInputs['orejas'].value = baseColor;
         }
-        // boca: slightly darker (use 6% here)
+        // aplicar a boca un tono ligeramente más oscuro (6%)
         const mouthDarker = darkenHex(baseColor, 0.06);
         if (colorInputs['boca']) {
           colorInputs['boca'].value = mouthDarker;
@@ -135,18 +135,18 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // global click to close dropdowns
+    // click global para cerrar dropdowns al hacer click fuera
     document.addEventListener('click', (e) => {
       if(!e.target.closest('.ctrl-select') && !e.target.closest('.ctrl-thumbs')) closeAllDropdowns();
     });
 
-    // initial render
+    // render inicial
     renderPreview();
   }).catch(err => {
     console.error('Error fetching assets', err);
   });
 
-  // helpers
+  // helpers de UI
   function displayName(item){
     if(!item) return '—';
     return item.name || (item.lineart ? item.lineart.split('/').pop() : item.fondo ? item.fondo.split('/').pop() : 'item');
@@ -156,28 +156,29 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.ctrl-thumbs.active').forEach(n => n.remove());
   }
 
-  // renderPreview: draw guide, then for each category in renderOrder draw fondo (tinted) then lineart
+  // renderPreview: dibuja guía (si existe), y luego para cada capa del renderOrder dibuja
+  // primero el fondo (tintado) y después el lineart encima
   async function renderPreview(){
-    // clear
+    // limpiar canvas
     ctx.clearRect(0,0,SIZE,SIZE);
 
-    // draw guide first if present
+    // dibujar guía primero (capa inmutable de referencia)
     if(guideURL){
       await drawImageSafe(guideURL);
     }
 
-    // iterate renderOrder (de abajo hacia arriba)
+    // recorrer el orden de capas (de abajo hacia arriba)
     for(const layer of renderOrder){
       const sel = state[layer];
       if(!sel) continue;
 
-      // 1) draw fondo if exists (apply tint if color input present)
+      // 1) fondo: si existe, aplicar tintado según el input de color correspondiente
       const fondoURL = sel.fondo || null;
       if(fondoURL){
         await drawImageWithTintIfNeeded(fondoURL, colorInputs[layer]);
       }
 
-      // 2) draw selected lineart (on top)
+      // 2) lineart: dibujar encima (sin tintar)
       const lineartURL = sel.lineart || null;
       if(lineartURL){
         await drawImageSafe(lineartURL);
@@ -185,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // draw image safely (returns a Promise that resolves when done or on error)
+  // dibuja una imagen en el canvas principal; resuelve incluso si hay error de carga
   function drawImageSafe(src){
     return new Promise(res => {
       if(!src){ res(); return; }
@@ -200,14 +201,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // draw image then tint it if color input exists (applies tint only to the image area)
+  // dibuja la imagen en un canvas temporal, aplica tintado (si colorInput tiene valor)
+  // y luego compone ese resultado sobre el canvas principal
   function drawImageWithTintIfNeeded(src, colorInput){
     return new Promise(res => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
         if(colorInput && colorInput.value){
-          // draw to temp canvas, tint and composite onto main ctx
+          // canvas temporal: dibujamos la capa, luego rellenamos con el color usando source-atop
           const tmp = document.createElement('canvas');
           tmp.width = SIZE; tmp.height = SIZE;
           const tctx = tmp.getContext('2d');
@@ -217,9 +219,11 @@ document.addEventListener('DOMContentLoaded', () => {
           tctx.fillStyle = colorInput.value;
           tctx.fillRect(0,0,SIZE,SIZE);
           tctx.globalCompositeOperation = 'source-over';
+          // compositamos el resultado en el canvas principal
           ctx.drawImage(tmp, 0, 0, SIZE, SIZE);
           res();
         } else {
+          // si no hay color, dibujamos la imagen tal cual
           ctx.drawImage(img, 0, 0, SIZE, SIZE);
           res();
         }
@@ -229,12 +233,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Buttons: preview/update and reset
+  // botones: actualizar y reset
   const btnPreview = document.getElementById('btn-preview');
   const btnReset = document.getElementById('btn-reset');
   if(btnPreview) btnPreview.addEventListener('click', () => renderPreview());
   if(btnReset) btnReset.addEventListener('click', () => {
-    // reset to first item per category
+    // reset: devolver a la primera variante por categoría y colores en blanco
     if(!assets) return;
     categories.forEach(cat => {
       const list = (assets[cat] || []);
@@ -247,13 +251,13 @@ document.addEventListener('DOMContentLoaded', () => {
     renderPreview();
   });
 
-  // Export helpers (client-side basic download for current canvas)
+  // helper público para descargar la previsualización actual como PNG (client-side)
   window.downloadPreviewPNG = function(filename='xpresarte.png', size=512){
-    // create export canvas at desired resolution
+    // crear canvas de salida a la resolución deseada
     const out = document.createElement('canvas');
     out.width = size; out.height = size;
     const outCtx = out.getContext('2d');
-    // draw current canvas scaled
+    // dibujar el canvas visible escalado a la resolución de salida
     outCtx.drawImage(canvas, 0, 0, size, size);
     const url = out.toDataURL('image/png');
     const a = document.createElement('a');
